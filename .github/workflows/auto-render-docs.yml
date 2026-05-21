@@ -1,0 +1,67 @@
+name: Automated Cross-Repo Documentation Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ingest-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Central Documentation Hub
+        uses: actions/checkout@v4
+        with:
+          path: hub
+
+      - name: Ingest Legacy Manual Repository (currentdoc)
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/currentdoc
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          path: currentdoc_src
+
+      - name: Ingest Greenfield Source Code Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/greenfield-code
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          path: greenfield_src
+
+      - name: Ingest Brownfield Source Code Repository
+        uses: actions/checkout@v4
+        with:
+          repository: jijeeshlab/brownfield-code
+          token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
+          path: brownfield_src
+
+      - name: Consolidate Code Assets and Manual Artifacts
+        run: |
+          mkdir -p hub/src
+          mkdir -p hub/docs/legacy
+          [ -d "greenfield_src/src" ] && cp -r greenfield_src/src/. hub/src/
+          [ -d "brownfield_src/src" ] && cp -r brownfield_src/src/. hub/src/
+          rsync -av --exclude='.git*' currentdoc_src/ hub/docs/legacy/
+
+      - name: Set Up Python Environment Engine
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs and Automated AutoDoc Parsers
+        run: |
+          pip install mkdocs-material "mkdocstrings[python]"
+
+      - name: Compile Automated Portal Structure
+        run: |
+          cd hub
+          mkdocs build --strict
+
+      - name: Deploy Self-Healed Unified Artifacts to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./hub/site
