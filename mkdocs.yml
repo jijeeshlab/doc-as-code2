@@ -1,0 +1,30 @@
+site_name: JijeeshLab Operational Control Portal
+site_url: https://jijeeshlab.github.io/doc-as-code2/
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: teal
+  features:
+    - navigation.tabs
+    - content.code.copy
+
+nav:
+  - Welcome Dashboard: index.md
+  - Automated Modules:
+    - Greenfield Code Stacks: greenfield_auto.md
+    - Brownfield Migration Specs: brownfield_auto.md
+  - Legacy Core Guidelines:
+    - Hardware Checklist: legacy/hardware_checklist.md
+    - Compliance Framework: legacy/compliance_policy.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
