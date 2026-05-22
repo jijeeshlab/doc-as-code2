@@ -18,7 +18,7 @@ jobs:
         with:
           path: hub
 
-      # Step 2: Ingest legacy manually written checklists (Hardened for Fine-Grained Tokens)
+      # Step 2: Ingest legacy manually written checklists
       - name: Ingest Legacy Manual Repository (currentdoc)
         uses: actions/checkout@v4
         with:
@@ -28,7 +28,7 @@ jobs:
           ref: main
           persist-credentials: false
 
-      # Step 3: Ingest Greenfield code modules (Hardened for Fine-Grained Tokens)
+      # Step 3: Ingest Greenfield code modules
       - name: Ingest Greenfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -38,7 +38,7 @@ jobs:
           ref: main
           persist-credentials: false
 
-      # Step 4: Ingest Brownfield migration assets (Hardened for Fine-Grained Tokens)
+      # Step 4: Ingest Brownfield migration assets
       - name: Ingest Brownfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -48,31 +48,22 @@ jobs:
           ref: main
           persist-credentials: false
 
-      # Step 5: Consolidate cross-repo sources and self-heal broken file formats/encodings
+      # Step 5: Consolidate cross-repo sources and aggressively fix all encoding matrix layouts
       - name: Consolidate Code Assets and Manual Artifacts
         run: |
           mkdir -p hub/src
           mkdir -p hub/docs/legacy
           
-          # Copy source directories from code spokes into the hub compilation root
+          # 1. Copy source directories from code spokes into the hub compilation root
           [ -d "greenfield_src/src" ] && cp -r greenfield_src/src/. hub/src/
           [ -d "brownfield_src/src" ] && cp -r brownfield_src/src/. hub/src/
           
-          # Sync manual files into the legacy target folder block
+          # 2. Sync manual files into the legacy target folder block
           rsync -av --exclude='.git*' currentdoc_src/ hub/docs/legacy/
           
-          # SELF-HEALING ENGINE: Detect and rewrite UTF-16/BOM files to standard web UTF-8
-          echo "[Self-Healing] Checking markdown files for encoding conflicts..."
-          find hub/docs/ -name "*.md" -type f | while read -r file; do
-            if file "$file" | grep -E 'UTF-16|UCS-2'; then
-              echo "[Self-Healing] Converting encoding from UTF-16 to UTF-8 for: $file"
-              iconv -f UTF-16 -t UTF-8 "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-            fi
-          done
-
-          # SELF-HEALING ENGINE: Verify and guarantee that a home landing page file exists
+          # 3. Handle missing home landing page before running encoding fixes
           if [ ! -f "hub/docs/index.md" ]; then
-            echo "[Self-Healing] Generating missing navigation landing point (index.md)..."
+            echo "[Setup] Injecting landing page resource..."
             if [ -f "hub/README.md" ]; then
               cp hub/README.md hub/docs/index.md
             else
@@ -80,6 +71,16 @@ jobs:
               echo "Welcome to the JijeeshLab Operations Portal control deck." >> hub/docs/index.md
             fi
           fi
+
+          # 4. GLOBAL SELF-HEALING ENGINE: Aggressively target and rewrite ANY UTF-16 markdown file inside hub/docs/
+          echo "[Self-Healing] Scanning and sanitizing all target workspace markdown files..."
+          find hub/docs/ -name "*.md" -type f | while read -r file; do
+            # Fallback check using file metadata signature or looking for byte order marks
+            if file "$file" | grep -E 'UTF-16|UCS-2' || head -c 2 "$file" | grep -q $'\xff\xfe' || head -c 2 "$file" | grep -q $'\xfe\xff'; then
+              echo "[Self-Healing] Rewriting encoding format to clean UTF-8 for: $file"
+              iconv -f UTF-16 -t UTF-8 "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+            fi
+          done
 
       # Step 6: Deploy isolated Python workspace runtime environments
       - name: Set Up Python Environment Engine
