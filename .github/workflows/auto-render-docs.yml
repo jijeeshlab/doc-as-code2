@@ -18,7 +18,7 @@ jobs:
         with:
           path: hub
 
-      # Step 2: Checkout the legacy documents folder (Hardened with direct branch mapping)
+      # Step 2: Ingest legacy documents (Hardened with read-only restriction)
       - name: Ingest Legacy Manual Repository (currentdoc)
         uses: actions/checkout@v4
         with:
@@ -26,8 +26,9 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: currentdoc_src
           ref: main
+          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
 
-      # Step 3: Checkout greenfield system source code (Hardened with direct branch mapping)
+      # Step 3: Ingest greenfield source code (Hardened with read-only restriction)
       - name: Ingest Greenfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -35,8 +36,9 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: greenfield_src
           ref: main
+          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
 
-      # Step 4: Checkout brownfield system source code (Hardened with direct branch mapping)
+      # Step 4: Ingest brownfield source code (Hardened with read-only restriction)
       - name: Ingest Brownfield Source Code Repository
         uses: actions/checkout@v4
         with:
@@ -44,6 +46,7 @@ jobs:
           token: ${{ secrets.CENTRAL_DOCS_TOKEN }}
           path: brownfield_src
           ref: main
+          persist-credentials: false # <--- FIXES THE 403 ERROR BY ENFORCING READ-ONLY CLONING
 
       # Step 5: Consolidate application directories and legacy checklists into compilation staging
       - name: Consolidate Code Assets and Manual Artifacts
