@@ -17,7 +17,6 @@ nav:
     - Brownfield Migration Specs: brownfield_auto.md
   - Legacy Core Guidelines:
     - Hardware Checklist: legacy/hardware_checklist.md
-    - Compliance Framework: legacy/compliance_policy.md
 
 plugins:
   - search
@@ -28,3 +27,5 @@ plugins:
             docstring_style: google
             show_source: true
             show_root_heading: true
+            fallback: true
+            import_by_path: true
