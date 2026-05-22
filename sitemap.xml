@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/brownfield_auto/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/greenfield_auto/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/legacy/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/legacy/compliance_policy/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+    <url>
+         <loc>https://jijeeshlab.github.io/doc-as-code2/legacy/hardware_checklist/</loc>
+         <lastmod>2026-05-22</lastmod>
+    </url>
+</urlset>
