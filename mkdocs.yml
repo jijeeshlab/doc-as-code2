@@ -27,5 +27,5 @@ plugins:
             docstring_style: google
             show_source: true
             show_root_heading: true
-            fallback: true
+            allow_inspect: true
             import_by_path: true
